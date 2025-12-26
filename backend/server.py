@@ -369,14 +369,25 @@ async def start_forwarder(user_id: str, rule_id: str):
                     if media_type and rule['media_types'] and media_type not in rule['media_types']:
                         return
                 
-                # Forward message using the pre-fetched destination entity
+                # Copy message (without showing "Forwarded from") using send_message
                 try:
-                    # Use the destination_entity instead of just the ID
                     target = destination_entity if destination_entity else rule['destination_chat_id']
-                    await telegram_client.forward_messages(
-                        target,
-                        event.message
-                    )
+                    
+                    # Copy the message content instead of forwarding
+                    # This way it won't show "Forwarded from X"
+                    if event.message.media:
+                        # For media messages, download and re-send
+                        await telegram_client.send_message(
+                            target,
+                            message=message_text if message_text else None,
+                            file=event.message.media
+                        )
+                    else:
+                        # For text-only messages
+                        await telegram_client.send_message(
+                            target,
+                            message=message_text
+                        )
                     
                     # Log success
                     log = ForwardingLog(
