@@ -71,8 +71,16 @@ function DashboardPage({ userId, backendUrl, onLogout }) {
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      await Promise.all([fetchChats(), fetchRules(), fetchLogs()]);
-      setLoading(false);
+      try {
+        // Load rules and logs first (fast), then chats (can be slow)
+        await Promise.all([fetchRules(), fetchLogs()]);
+        setLoading(false);
+        // Fetch chats in background (can be slow due to Telegram API)
+        fetchChats();
+      } catch (error) {
+        console.error('Error loading data:', error);
+        setLoading(false);
+      }
     };
     loadData();
 
