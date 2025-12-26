@@ -357,6 +357,11 @@ function DashboardPage({ userId, backendUrl, onLogout }) {
                           <span className={`px-2 py-1 text-xs rounded-full ${rule.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
                             {rule.is_active ? 'Active' : 'Inactive'}
                           </span>
+                          {(rule.hide_source === true || rule.hide_source === undefined) && (
+                            <span className="px-2 py-1 text-xs rounded-full bg-purple-100 text-purple-700">
+                              Hidden Source
+                            </span>
+                          )}
                         </div>
                         <div className="flex items-center gap-2 text-sm">
                           <span className="font-medium">{rule.source_chat_name}</span>
