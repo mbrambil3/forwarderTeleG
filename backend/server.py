@@ -371,24 +371,31 @@ async def start_forwarder(user_id: str, rule_id: str):
                     if media_type and rule['media_types'] and media_type not in rule['media_types']:
                         return
                 
-                # Copy message (without showing "Forwarded from") using send_message
+                # Send/forward message based on hide_source setting
                 try:
                     target = destination_entity if destination_entity else rule['destination_chat_id']
+                    hide_source = rule.get('hide_source', True)  # Default to True (copy without showing source)
                     
-                    # Copy the message content instead of forwarding
-                    # This way it won't show "Forwarded from X"
-                    if event.message.media:
-                        # For media messages, download and re-send
-                        await telegram_client.send_message(
-                            target,
-                            message=message_text if message_text else None,
-                            file=event.message.media
-                        )
+                    if hide_source:
+                        # Copy the message content (won't show "Forwarded from X")
+                        if event.message.media:
+                            # For media messages, re-send with media
+                            await telegram_client.send_message(
+                                target,
+                                message=message_text if message_text else None,
+                                file=event.message.media
+                            )
+                        else:
+                            # For text-only messages
+                            await telegram_client.send_message(
+                                target,
+                                message=message_text
+                            )
                     else:
-                        # For text-only messages
-                        await telegram_client.send_message(
+                        # Forward normally (will show "Forwarded from X")
+                        await telegram_client.forward_messages(
                             target,
-                            message=message_text
+                            event.message
                         )
                     
                     # Log success
