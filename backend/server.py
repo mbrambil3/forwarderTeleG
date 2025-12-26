@@ -100,6 +100,20 @@ class ForwardingLog(BaseModel):
 @api_router.post("/telegram/auth/start")
 async def start_telegram_auth(auth_request: TelegramAuthRequest):
     try:
+        # Check if there's an existing authenticated session for this phone number
+        existing_session = await db.telegram_sessions.find_one({
+            "phone_number": auth_request.phone_number,
+            "is_authenticated": True
+        }, {"_id": 0})
+        
+        if existing_session:
+            # Reuse existing user_id to preserve rules and logs
+            user_id = existing_session['user_id']
+            logging.info(f"Reusing existing session for {auth_request.phone_number}: {user_id}")
+        else:
+            # Generate new user_id
+            user_id = str(uuid.uuid4())
+        
         # Create a new session
         session = StringSession()
         telegram_client = TelegramClient(session, auth_request.api_id, auth_request.api_hash)
@@ -109,21 +123,29 @@ async def start_telegram_auth(auth_request: TelegramAuthRequest):
         # Send code request
         await telegram_client.send_code_request(auth_request.phone_number)
         
-        # Generate user_id
-        user_id = str(uuid.uuid4())
-        
-        # Store session info in database
-        session_doc = TelegramSession(
-            user_id=user_id,
-            api_id=auth_request.api_id,
-            api_hash=auth_request.api_hash,
-            phone_number=auth_request.phone_number,
-            is_authenticated=False
-        )
-        
-        doc = session_doc.model_dump()
-        doc['created_at'] = doc['created_at'].isoformat()
-        await db.telegram_sessions.insert_one(doc)
+        if existing_session:
+            # Update existing session
+            await db.telegram_sessions.update_one(
+                {"user_id": user_id},
+                {"$set": {
+                    "api_id": auth_request.api_id,
+                    "api_hash": auth_request.api_hash,
+                    "is_authenticated": False  # Will be set to True after code verification
+                }}
+            )
+        else:
+            # Store new session info in database
+            session_doc = TelegramSession(
+                user_id=user_id,
+                api_id=auth_request.api_id,
+                api_hash=auth_request.api_hash,
+                phone_number=auth_request.phone_number,
+                is_authenticated=False
+            )
+            
+            doc = session_doc.model_dump()
+            doc['created_at'] = doc['created_at'].isoformat()
+            await db.telegram_sessions.insert_one(doc)
         
         # Store client temporarily
         active_forwarders[user_id] = telegram_client
@@ -132,6 +154,7 @@ async def start_telegram_auth(auth_request: TelegramAuthRequest):
     except Exception as e:
         logging.error(f"Error starting auth: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @api_router.post("/telegram/auth/verify")
 async def verify_telegram_code(code_request: TelegramCodeRequest):
