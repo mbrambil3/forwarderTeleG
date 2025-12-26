@@ -1,0 +1,173 @@
+{
+  "design_system": {
+    "identity": {
+      "name": "Telegram Autoforwarder Dashboard",
+      "archetype": "Soft Utility",
+      "vibe": "Technical, Reliable, Efficient, Secure",
+      "principles": [
+        "Fusion over Imitation: Mix Swiss precision with Telegram's friendly utility",
+        "Content is King: Data (logs/rules) comes first",
+        "Negative Space: Use whitespace to separate complex configuration options",
+        "Contrast: High contrast for status indicators (Running vs Stopped)"
+      ]
+    },
+    "typography": {
+      "fonts": {
+        "heading": "Manrope",
+        "body": "Public Sans",
+        "mono": "JetBrains Mono"
+      },
+      "usage": {
+        "headings": "font-heading font-bold tracking-tight text-foreground",
+        "subheadings": "font-heading font-semibold text-muted-foreground tracking-normal",
+        "body": "font-body text-base leading-relaxed",
+        "mono": "font-mono text-sm",
+        "labels": "font-body text-xs font-medium uppercase tracking-wider text-muted-foreground"
+      },
+      "google_fonts_import": "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Manrope:wght@400;600;700;800&family=Public+Sans:wght@400;500;600&display=swap"
+    },
+    "colors": {
+      "palette": {
+        "primary": {
+          "name": "Telegram Blue",
+          "hex": "#0088cc",
+          "hsl": "200 100% 40%",
+          "usage": "Primary buttons, active states, links, key highlights"
+        },
+        "background": {
+          "light": "hsl(210 40% 98%)",
+          "dark": "hsl(222 47% 11%)",
+          "usage": "App background. Avoid pure white/black."
+        },
+        "surface": {
+          "light": "#ffffff",
+          "dark": "hsl(217 33% 17%)",
+          "usage": "Cards, sidebars, modals"
+        },
+        "status": {
+          "success": "hsl(142 76% 36%)",
+          "error": "hsl(0 84% 60%)",
+          "warning": "hsl(48 96% 53%)",
+          "inactive": "hsl(215 16% 47%)"
+        }
+      },
+      "css_variables_update": {
+        "root": {
+          "--background": "210 40% 98%",
+          "--foreground": "222 47% 11%",
+          "--card": "0 0% 100%",
+          "--card-foreground": "222 47% 11%",
+          "--popover": "0 0% 100%",
+          "--popover-foreground": "222 47% 11%",
+          "--primary": "200 100% 40%",
+          "--primary-foreground": "210 40% 98%",
+          "--secondary": "210 40% 96.1%",
+          "--secondary-foreground": "222 47% 11%",
+          "--muted": "210 40% 96.1%",
+          "--muted-foreground": "215 16% 47%",
+          "--accent": "210 40% 96.1%",
+          "--accent-foreground": "222 47% 11%",
+          "--destructive": "0 84.2% 60.2%",
+          "--destructive-foreground": "210 40% 98%",
+          "--border": "214.3 31.8% 91.4%",
+          "--input": "214.3 31.8% 91.4%",
+          "--ring": "200 100% 40%",
+          "--radius": "0.5rem"
+        },
+        "dark": {
+          "--background": "222 47% 11%",
+          "--foreground": "210 40% 98%",
+          "--card": "217 33% 17%",
+          "--card-foreground": "210 40% 98%",
+          "--popover": "217 33% 17%",
+          "--popover-foreground": "210 40% 98%",
+          "--primary": "200 100% 50%",
+          "--primary-foreground": "222 47% 11%",
+          "--secondary": "217 33% 17%",
+          "--secondary-foreground": "210 40% 98%",
+          "--muted": "217 33% 17%",
+          "--muted-foreground": "215 20.2% 65.1%",
+          "--accent": "217 33% 17%",
+          "--accent-foreground": "210 40% 98%",
+          "--destructive": "0 62.8% 30.6%",
+          "--destructive-foreground": "210 40% 98%",
+          "--border": "217 33% 17%",
+          "--input": "217 33% 17%",
+          "--ring": "200 100% 50%"
+        }
+      }
+    },
+    "layout": {
+      "grid_strategy": "Control Room",
+      "spacing": {
+        "container_padding": "p-6 md:p-8 lg:p-12",
+        "section_gap": "gap-6 md:gap-8",
+        "card_padding": "p-6"
+      },
+      "containers": {
+        "dashboard": "grid grid-cols-1 md:grid-cols-12 gap-6",
+        "sidebar": "w-64 hidden md:block border-r h-screen sticky top-0",
+        "main_content": "flex-1 min-h-screen"
+      }
+    },
+    "components": {
+      "cards": {
+        "style": "bg-card border border-border rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200",
+        "header": "flex flex-row items-center justify-between space-y-0 pb-2"
+      },
+      "buttons": {
+        "primary": "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm",
+        "secondary": "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        "ghost": "hover:bg-accent hover:text-accent-foreground",
+        "destructive": "bg-destructive text-destructive-foreground hover:bg-destructive/90"
+      },
+      "inputs": {
+        "style": "bg-background border-input focus:ring-2 focus:ring-ring focus:border-transparent transition-all duration-200"
+      },
+      "status_indicators": {
+        "active": "h-2.5 w-2.5 rounded-full bg-green-500 animate-pulse",
+        "inactive": "h-2.5 w-2.5 rounded-full bg-gray-400",
+        "error": "h-2.5 w-2.5 rounded-full bg-red-500"
+      }
+    },
+    "visual_enhancers": {
+      "glassmorphism": "backdrop-blur-xl bg-background/80 border-b border-border/50 sticky top-0 z-50",
+      "gradients": "None. Use solid colors and subtle borders.",
+      "shadows": "shadow-sm for cards, shadow-lg for dropdowns/modals",
+      "borders": "1px solid border-border"
+    },
+    "motion": {
+      "transitions": "transition-all duration-200 ease-in-out",
+      "hover_lift": "hover:-translate-y-0.5",
+      "page_transition": "animate-in fade-in slide-in-from-bottom-4 duration-500"
+    },
+    "media": {
+      "image_urls": {
+        "login_background": "https://images.unsplash.com/photo-1760143769807-c282feb89d31?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Nzh8MHwxfHNlYXJjaHw0fHxtaW5pbWFsaXN0JTIwYWJzdHJhY3QlMjBibHVlJTIwdGVjaG5vbG9neSUyMGJhY2tncm91bmR8ZW58MHx8fHwxNzY2NzI5MzI1fDA&ixlib=rb-4.1.0&q=85",
+        "empty_state_dashboard": "https://images.unsplash.com/photo-1760224254103-3dcc15e4ad9d?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Nzh8MHwxfHNlYXJjaHwyfHxtaW5pbWFsaXN0JTIwYWJzdHJhY3QlMjBibHVlJTIwdGVjaG5vbG9neSUyMGJhY2tncm91bmR8ZW58MHx8fHwxNzY2NzI5MzI1fDA&ixlib=rb-4.1.0&q=85"
+      }
+    }
+  },
+  "instructions_to_main_agent": {
+    "setup": [
+      "Update /app/frontend/src/index.css with the provided CSS variables for Telegram Blue theme.",
+      "Install Google Fonts (Manrope, Public Sans, JetBrains Mono) in /app/frontend/src/index.css or index.html.",
+      "Configure Tailwind to use the new font families."
+    ],
+    "implementation_rules": [
+      "Use the 'Control Room' grid layout for the main dashboard.",
+      "Ensure the Sidebar is collapsible on mobile.",
+      "Use 'sonner' for all toast notifications (success/error).",
+      "Use 'lucide-react' for icons.",
+      "For the 'Logs' section, use a monospace font (JetBrains Mono) and a terminal-like appearance or a clean data table.",
+      "Ensure all interactive elements have data-testid attributes."
+    ],
+    "universal_guidelines": [
+      "Do not use gradients for backgrounds, stick to solid colors or subtle noise.",
+      "Ensure high contrast for text.",
+      "Use 'Manrope' for all headings.",
+      "Use 'Public Sans' for all body text.",
+      "Use 'JetBrains Mono' for code snippets, logs, and IDs."
+    ]
+  }
+}
