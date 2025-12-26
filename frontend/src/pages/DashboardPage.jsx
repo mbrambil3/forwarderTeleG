@@ -27,6 +27,7 @@ function DashboardPage({ userId, backendUrl, onLogout }) {
     keywords: '',
     filterMedia: false,
     mediaTypes: [],
+    hideSource: true,  // Default: hide source (no "Forwarded from")
   });
 
   const fetchChats = useCallback(async () => {
