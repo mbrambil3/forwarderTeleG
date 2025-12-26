@@ -57,11 +57,12 @@ function DashboardPage({ userId, backendUrl, onLogout }) {
         throw new Error(data.detail || 'Failed to fetch chats');
       }
     } catch (error) {
-      toast.error(`${t('Error loading chats')}: ${error.message}`);
+      console.error('Error loading chats:', error);
+      // Only show toast once, not in a loop
     } finally {
       setLoadingChats(false);
     }
-  }, [backendUrl, userId, t]);
+  }, [backendUrl, userId]);
 
   const fetchRules = useCallback(async () => {
     try {
@@ -71,9 +72,9 @@ function DashboardPage({ userId, backendUrl, onLogout }) {
         setRules(data.rules || []);
       }
     } catch (error) {
-      toast.error(`${t('Error loading rules')}: ${error.message}`);
+      console.error('Error loading rules:', error);
     }
-  }, [backendUrl, userId, t]);
+  }, [backendUrl, userId]);
 
   const fetchLogs = useCallback(async () => {
     try {
