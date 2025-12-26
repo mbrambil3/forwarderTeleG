@@ -294,6 +294,48 @@ async def start_forwarder(user_id: str, rule_id: str):
         telegram_client = TelegramClient(session, session_data['api_id'], session_data['api_hash'])
         await telegram_client.connect()
         
+        # IMPORTANT: Populate entity cache by iterating through all dialogs
+        # This fixes the "Could not find the input entity for PeerUser" error
+        logging.info(f"[Rule {rule_id}] Populating entity cache...")
+        entity_cache = {}
+        try:
+            async for dialog in telegram_client.iter_dialogs():
+                entity_cache[dialog.id] = dialog.entity
+            logging.info(f"[Rule {rule_id}] Cached {len(entity_cache)} entities")
+        except Exception as cache_error:
+            logging.warning(f"[Rule {rule_id}] Error populating cache: {cache_error}")
+        
+        # Pre-fetch destination entity to ensure we have access
+        destination_entity = None
+        try:
+            destination_entity = await telegram_client.get_entity(rule['destination_chat_id'])
+            logging.info(f"[Rule {rule_id}] Destination entity found: {destination_entity}")
+        except Exception as dest_error:
+            logging.error(f"[Rule {rule_id}] Could not find destination entity: {dest_error}")
+            # Try to get from cache
+            if rule['destination_chat_id'] in entity_cache:
+                destination_entity = entity_cache[rule['destination_chat_id']]
+                logging.info(f"[Rule {rule_id}] Using cached destination entity")
+            else:
+                # Log failure and deactivate rule
+                log = ForwardingLog(
+                    rule_id=rule_id,
+                    user_id=user_id,
+                    message_text="Failed to start forwarder",
+                    has_media=False,
+                    status='failed',
+                    error_message=f"Destination not accessible: {str(dest_error)[:150]}"
+                )
+                log_doc = log.model_dump()
+                log_doc['forwarded_at'] = log_doc['forwarded_at'].isoformat()
+                await db.forwarding_logs.insert_one(log_doc)
+                
+                await db.forwarding_rules.update_one(
+                    {"rule_id": rule_id},
+                    {"$set": {"is_active": False}}
+                )
+                return
+        
         # Store client
         forwarder_key = f"{user_id}_{rule_id}"
         active_forwarders[forwarder_key] = telegram_client
@@ -327,10 +369,12 @@ async def start_forwarder(user_id: str, rule_id: str):
                     if media_type and rule['media_types'] and media_type not in rule['media_types']:
                         return
                 
-                # Forward message
+                # Forward message using the pre-fetched destination entity
                 try:
+                    # Use the destination_entity instead of just the ID
+                    target = destination_entity if destination_entity else rule['destination_chat_id']
                     await telegram_client.forward_messages(
-                        rule['destination_chat_id'],
+                        target,
                         event.message
                     )
                     
@@ -350,6 +394,7 @@ async def start_forwarder(user_id: str, rule_id: str):
                 except Exception as forward_error:
                     # Log failure
                     error_str = str(forward_error)
+                    logging.error(f"[Rule {rule_id}] Forward error: {error_str}")
                     
                     # Check if destination chat was deleted
                     if 'PEER_ID_INVALID' in error_str or 'CHAT_WRITE_FORBIDDEN' in error_str:
