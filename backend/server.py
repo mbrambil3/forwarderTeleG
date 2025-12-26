@@ -69,6 +69,7 @@ class ForwardingRule(BaseModel):
     keywords: List[str] = []
     filter_media: bool = False
     media_types: List[str] = []  # ['photo', 'video', 'document', 'audio']
+    hide_source: bool = True  # If True, copy message (no "Forwarded from"), if False, forward normally
     is_active: bool = False
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
@@ -81,6 +82,7 @@ class ForwardingRuleCreate(BaseModel):
     keywords: List[str] = []
     filter_media: bool = False
     media_types: List[str] = []
+    hide_source: bool = True  # Default: hide the source
 
 class ForwardingLog(BaseModel):
     model_config = ConfigDict(extra="ignore")
