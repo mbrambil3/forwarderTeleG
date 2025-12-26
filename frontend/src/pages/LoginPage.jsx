@@ -5,8 +5,10 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../components/ui/card';
+import { useTranslation } from '../lib/i18n';
 
 function LoginPage({ backendUrl, onLogin }) {
+  const { t } = useTranslation();
   const [step, setStep] = useState('credentials'); // 'credentials', 'code', '2fa'
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -41,7 +43,7 @@ function LoginPage({ backendUrl, onLogin }) {
 
       setTempUserId(data.user_id);
       setStep('code');
-      toast.success('Verification code sent to your phone!');
+      toast.success(t('Verification code sent to your phone!'));
     } catch (error) {
       toast.error(error.message);
     } finally {
@@ -72,11 +74,11 @@ function LoginPage({ backendUrl, onLogin }) {
 
       if (data.requires_password) {
         setStep('2fa');
-        toast.info('2FA is enabled. Please enter your password.');
+        toast.info(t('2FA is enabled. Please enter your password.'));
         return;
       }
 
-      toast.success('Successfully authenticated!');
+      toast.success(t('Successfully authenticated!'));
       onLogin(data.user_id);
     } catch (error) {
       toast.error(error.message);
@@ -102,11 +104,11 @@ function LoginPage({ backendUrl, onLogin }) {
               <Send className="w-8 h-8 text-primary-foreground" />
             </div>
           </div>
-          <CardTitle className="text-3xl font-bold">Telegram Autoforwarder</CardTitle>
+          <CardTitle className="text-3xl font-bold">{t('Telegram Autoforwarder')}</CardTitle>
           <CardDescription>
-            {step === 'credentials' && 'Enter your Telegram API credentials'}
-            {step === 'code' && 'Enter the verification code sent to your phone'}
-            {step === '2fa' && 'Enter your 2FA password'}
+            {step === 'credentials' && t('Enter your Telegram API credentials')}
+            {step === 'code' && t('Enter the verification code sent to your phone')}
+            {step === '2fa' && t('Enter your 2FA password')}
           </CardDescription>
         </CardHeader>
 
@@ -114,7 +116,7 @@ function LoginPage({ backendUrl, onLogin }) {
           {step === 'credentials' && (
             <form onSubmit={handleCredentialsSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="apiId">API ID</Label>
+                <Label htmlFor="apiId">{t('API ID')}</Label>
                 <Input
                   id="apiId"
                   type="number"
@@ -126,7 +128,7 @@ function LoginPage({ backendUrl, onLogin }) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="apiHash">API Hash</Label>
+                <Label htmlFor="apiHash">{t('API Hash')}</Label>
                 <Input
                   id="apiHash"
                   type="text"
@@ -138,7 +140,7 @@ function LoginPage({ backendUrl, onLogin }) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="phoneNumber">Phone Number</Label>
+                <Label htmlFor="phoneNumber">{t('Phone Number')}</Label>
                 <Input
                   id="phoneNumber"
                   type="tel"
@@ -151,14 +153,14 @@ function LoginPage({ backendUrl, onLogin }) {
 
               <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? (
-                  <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Sending...</>
+                  <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> {t('Sending...')}</>
                 ) : (
-                  'Send Code'
+                  t('Send Code')
                 )}
               </Button>
 
               <p className="text-xs text-muted-foreground text-center">
-                Get your API credentials from{' '}
+                {t('Get your API credentials from')}{' '}
                 <a
                   href="https://my.telegram.org/"
                   target="_blank"
@@ -174,7 +176,7 @@ function LoginPage({ backendUrl, onLogin }) {
           {step === 'code' && (
             <form onSubmit={handleCodeSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="code">Verification Code</Label>
+                <Label htmlFor="code">{t('Verification Code')}</Label>
                 <Input
                   id="code"
                   type="text"
@@ -188,9 +190,9 @@ function LoginPage({ backendUrl, onLogin }) {
 
               <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? (
-                  <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Verifying...</>
+                  <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> {t('Verifying...')}</>
                 ) : (
-                  'Verify Code'
+                  t('Verify Code')
                 )}
               </Button>
 
@@ -200,7 +202,7 @@ function LoginPage({ backendUrl, onLogin }) {
                 className="w-full"
                 onClick={() => setStep('credentials')}
               >
-                Back
+                {t('Back')}
               </Button>
             </form>
           )}
@@ -208,7 +210,7 @@ function LoginPage({ backendUrl, onLogin }) {
           {step === '2fa' && (
             <form onSubmit={handleCodeSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="password">2FA Password</Label>
+                <Label htmlFor="password">{t('2FA Password')}</Label>
                 <Input
                   id="password"
                   type="password"
@@ -222,9 +224,9 @@ function LoginPage({ backendUrl, onLogin }) {
 
               <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? (
-                  <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Verifying...</>
+                  <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> {t('Verifying...')}</>
                 ) : (
-                  'Submit'
+                  t('Submit')
                 )}
               </Button>
             </form>
