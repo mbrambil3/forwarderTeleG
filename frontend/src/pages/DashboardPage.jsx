@@ -259,14 +259,21 @@ function DashboardPage({ userId, backendUrl, onLogout }) {
                       </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
+                      {loadingChats && (
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Loading your Telegram chats...
+                        </div>
+                      )}
                       <div className="space-y-2">
                         <Label>Source Chat</Label>
                         <Select
                           value={newRule.sourceChat}
                           onValueChange={(value) => setNewRule({ ...newRule, sourceChat: value })}
+                          disabled={loadingChats}
                         >
                           <SelectTrigger>
-                            <SelectValue placeholder="Select source chat" />
+                            <SelectValue placeholder={loadingChats ? "Loading chats..." : "Select source chat"} />
                           </SelectTrigger>
                           <SelectContent>
                             {chats.map((chat) => (
@@ -283,9 +290,10 @@ function DashboardPage({ userId, backendUrl, onLogout }) {
                         <Select
                           value={newRule.destinationChat}
                           onValueChange={(value) => setNewRule({ ...newRule, destinationChat: value })}
+                          disabled={loadingChats}
                         >
                           <SelectTrigger>
-                            <SelectValue placeholder="Select destination chat" />
+                            <SelectValue placeholder={loadingChats ? "Loading chats..." : "Select destination chat"} />
                           </SelectTrigger>
                           <SelectContent>
                             {chats.map((chat) => (
