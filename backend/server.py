@@ -233,6 +233,53 @@ async def get_forwarding_rules(user_id: str):
         logging.error(f"Error getting rules: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+class ForwardingRuleUpdate(BaseModel):
+    source_chat_id: Optional[int] = None
+    source_chat_name: Optional[str] = None
+    destination_chat_id: Optional[int] = None
+    destination_chat_name: Optional[str] = None
+    keywords: Optional[List[str]] = None
+    filter_media: Optional[bool] = None
+    media_types: Optional[List[str]] = None
+    hide_source: Optional[bool] = None
+
+@api_router.put("/forwarding/rules/{rule_id}")
+async def update_forwarding_rule(rule_id: str, rule_update: ForwardingRuleUpdate, background_tasks: BackgroundTasks):
+    try:
+        existing_rule = await db.forwarding_rules.find_one({"rule_id": rule_id}, {"_id": 0})
+        if not existing_rule:
+            raise HTTPException(status_code=404, detail="Rule not found")
+        
+        # Build update dict with only provided fields
+        update_data = {k: v for k, v in rule_update.model_dump().items() if v is not None}
+        
+        if not update_data:
+            raise HTTPException(status_code=400, detail="No fields to update")
+        
+        # If rule is active and destination changed, restart forwarder
+        restart_needed = existing_rule['is_active'] and (
+            'destination_chat_id' in update_data or 'source_chat_id' in update_data
+        )
+        
+        if restart_needed:
+            await stop_forwarder(rule_id)
+        
+        await db.forwarding_rules.update_one(
+            {"rule_id": rule_id},
+            {"$set": update_data}
+        )
+        
+        if restart_needed:
+            background_tasks.add_task(start_forwarder, existing_rule['user_id'], rule_id)
+        
+        updated_rule = await db.forwarding_rules.find_one({"rule_id": rule_id}, {"_id": 0})
+        return updated_rule
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error updating rule: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.delete("/forwarding/rules/{rule_id}")
 async def delete_forwarding_rule(rule_id: str):
     try:
