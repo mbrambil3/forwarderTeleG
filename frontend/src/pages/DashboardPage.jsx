@@ -18,6 +18,7 @@ function DashboardPage({ userId, backendUrl, onLogout }) {
   const [rules, setRules] = useState([]);
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingChats, setLoadingChats] = useState(false);
   const [isCreatingRule, setIsCreatingRule] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   
@@ -31,6 +32,7 @@ function DashboardPage({ userId, backendUrl, onLogout }) {
   });
 
   const fetchChats = useCallback(async () => {
+    setLoadingChats(true);
     try {
       const response = await fetch(`${backendUrl}/api/telegram/chats/${userId}`);
       const data = await response.json();
@@ -41,6 +43,8 @@ function DashboardPage({ userId, backendUrl, onLogout }) {
       }
     } catch (error) {
       toast.error(`Error loading chats: ${error.message}`);
+    } finally {
+      setLoadingChats(false);
     }
   }, [backendUrl, userId]);
 
