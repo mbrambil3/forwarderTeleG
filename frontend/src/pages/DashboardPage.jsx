@@ -110,6 +110,7 @@ function DashboardPage({ userId, backendUrl, onLogout }) {
           keywords: newRule.keywords.split(',').map(k => k.trim()).filter(k => k),
           filter_media: newRule.filterMedia,
           media_types: newRule.mediaTypes,
+          hide_source: newRule.hideSource,
         }),
       });
 
@@ -126,6 +127,7 @@ function DashboardPage({ userId, backendUrl, onLogout }) {
         keywords: '',
         filterMedia: false,
         mediaTypes: [],
+        hideSource: true,
       });
       await fetchRules();
     } catch (error) {
