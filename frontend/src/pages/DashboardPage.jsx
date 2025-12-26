@@ -307,6 +307,17 @@ function DashboardPage({ userId, backendUrl, onLogout }) {
                           onCheckedChange={(checked) => setNewRule({ ...newRule, filterMedia: checked })}
                         />
                       </div>
+
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <Label>Hide Source</Label>
+                          <p className="text-xs text-muted-foreground">Don't show "Forwarded from X" in destination</p>
+                        </div>
+                        <Switch
+                          checked={newRule.hideSource}
+                          onCheckedChange={(checked) => setNewRule({ ...newRule, hideSource: checked })}
+                        />
+                      </div>
                     </div>
                     <DialogFooter>
                       <Button variant="outline" onClick={() => setDialogOpen(false)}>
