@@ -88,22 +88,35 @@ function DashboardPage({ userId, backendUrl, onLogout }) {
   }, [backendUrl, userId]);
 
   useEffect(() => {
+    let mounted = true;
+    
     const loadData = async () => {
       setLoading(true);
       try {
         await Promise.all([fetchRules(), fetchLogs()]);
-        setLoading(false);
-        fetchChats();
+        if (mounted) {
+          setLoading(false);
+          fetchChats();
+        }
       } catch (error) {
         console.error('Error loading data:', error);
-        setLoading(false);
+        if (mounted) {
+          setLoading(false);
+        }
       }
     };
     loadData();
 
-    const interval = setInterval(fetchLogs, 10000);
-    return () => clearInterval(interval);
-  }, [fetchChats, fetchRules, fetchLogs]);
+    const interval = setInterval(() => {
+      if (mounted) fetchLogs();
+    }, 10000);
+    
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId, backendUrl]);
 
   const handleOpenDialog = (rule = null) => {
     if (rule) {
